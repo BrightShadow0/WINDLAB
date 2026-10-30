@@ -2,7 +2,7 @@ export const DEFAULTS={wind:8.5,direction:0,turbulence:8,density:1.225,load:.72,
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),rad=d=>d*Math.PI/180,TWO_PI=2*Math.PI;
 const MODELS={HAWT:{radius:63,area:Math.PI*63**2,inertia:4.2e7,cutIn:3,cutOut:25,cpPeak:.46,tsrOpt:7.4,width:4.5,drive:.94,gen:.93,maxRpm:12.1},VAWT:{radius:4.2,area:2*4.2*18,inertia:680,cutIn:2.5,cutOut:25,cpPeak:.31,tsrOpt:2.7,width:2.2,drive:.97,gen:.93,maxRpm:180}};
 export const modelParameters=t=>MODELS[t]||MODELS.HAWT;
-const cpAt=(tsr,t)=>{const m=modelParameters(t);return clamp(m.cpPeak*Math.exp(-((tsr-m.tsrOpt)/m.width)**2)*(1-Math.exp(-Math.max(0,tsr)/1.15)),0,t==='HAWT'?.593:.45);};
+const cpAt=(tsr,t)=>{const m=modelParameters(t);return clamp(m.cpPeak*Math.exp(-Math.pow((tsr-m.tsrOpt)/m.width,2))*(1-Math.exp(-Math.max(0,tsr)/1.15)),0,t==='HAWT'?.593:.45);};
 const directionFactor=d=>clamp(.86+.11*Math.cos(2*rad(d-18))+.03*Math.cos(4*rad(d)),.68,1);
 const yawFactor=(t,p)=>t!=='HAWT'||p.yawMode!=='fixed'?1:Math.pow(Math.max(0,Math.cos(rad(Math.abs(((p.direction+180)%360)-180)))),1.88);
 export function effectiveWind(p,time=0){const intensity=clamp((p.turbulence||0)/100,0,.3),gust=.62*Math.sin(time*1.71)+.38*Math.sin(time*.47+1.2);return Math.max(0,p.wind*(1+intensity*gust));}
