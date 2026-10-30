@@ -13,9 +13,11 @@ function estimateAcousticLevel(type,p,{wind,rpm,tsr,cp,yawFactor:yaw}){
  // Research-informed trend estimator, not a BPM/FW-H aeroacoustic solver.
  // A 10% speed change maps to roughly 2-2.5 dB in this simplified model.
  const referenceRpm=m.tsrOpt*Math.max(wind,m.cutIn)/m.radius*60/TWO_PI;
- const speedRatio=clamp(rpm/Math.max(referenceRpm,1),.05,2.5);
- const speedSensitivity=type!=='VAWT'?60:50;
- const rotorSpeedEffect=speedSensitivity*Math.log10(speedRatio);
+ // Acoustic output builds with rotor speed and reaches its operating peak
+ // when the rotor reaches its wind-dependent target RPM. It does not keep
+ // increasing beyond that target in this simplified comparison model.
+ const speedRatio=clamp(rpm/Math.max(referenceRpm,1),.01,1);
+ const rotorSpeedEffect=20*Math.log10(speedRatio);
  const windEffect=8*Math.log10(Math.max(wind,1)/8);
  const turbulence=clamp((p.turbulence||0)/30,0,1);
  const turbulenceEffect=2.5*Math.sqrt(turbulence);
@@ -49,8 +51,9 @@ export function stepRotor(type,p,previous,dt,time=0){
   const targetOmega=m.tsrOpt*v/m.radius;
   const targetRpm=clamp(targetOmega*60/TWO_PI,m.minRpm,m.maxRpm);
   const target=targetRpm*TWO_PI/60;
-  // First-order rotor-speed response gives a stable, smooth approach to target.
-  const response=Math.max(.08,1-Math.exp(-h/m.responseTime));
+  // Exact first-order response: no minimum per-frame jump, so rotor RPM
+  // builds smoothly over the configured response time.
+  const response=1-Math.exp(-h/m.responseTime);
   omega+=(target-omega)*response;
   omega=clamp(omega,0,m.maxRpm*TWO_PI/60*1.03);
  }
