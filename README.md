@@ -62,7 +62,7 @@ This is an educational reduced-order model, not validated CFD, a certified digit
 - The HAWT is not a reproduction of the full NREL aero-servo-elastic model or its certified power curve.
 - Detailed blade-element aerodynamics, dynamic stall, drivetrain compliance, structural loads and turbine controller dynamics are not modelled.
 - Turbulence is a deterministic gust approximation, not a full atmospheric-boundary-layer model.
-- Noise does not include validated source data, propagation, distance, terrain or directivity.
+- Noise does not include validated source data, propagation, distance, terrain, directivity or environmental ambient noise.
 - Animated airflow particles are visual cues, not CFD streamlines.
 - A fair comparison requires matched swept area, scale, operating constraints and validated turbine-specific data.
 
