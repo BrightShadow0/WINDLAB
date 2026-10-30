@@ -1,7 +1,7 @@
 # WINDLAB
 ### Interactive 3D Wind-Turbine Simulation and Comparative Analysis
 
-WINDLAB is an educational simulator comparing a conventional three-bladed horizontal-axis wind turbine (HAWT), a whale-tubercle-inspired three-bladed HAWT, and a custom two-panel twisted vertical-axis wind turbine (VAWT). It combines an interactive Three.js scene, adjustable wind conditions, reduced-order rotor dynamics and dynamically generated performance plots.
+WINDLAB is an educational, hypothesis-driven simulator comparing a conventional three-bladed horizontal-axis wind turbine (HAWT), a whale-tubercle-inspired three-bladed HAWT, and a custom two-panel twisted vertical-axis wind turbine (VAWT). Its central research question is whether bio-inspired blade geometries could reduce operational noise while retaining useful energy-generation performance. It combines an interactive Three.js scene, adjustable wind conditions, reduced-order rotor dynamics, live telemetry and dynamically generated performance plots. The acoustic differences are theoretical model assumptions for exploration, not experimentally validated claims.
 
 ## Run locally
 ```bash
@@ -21,6 +21,7 @@ npm run preview
 - Rotor angular dynamics driven by aerodynamic torque, generator-load torque and mechanical losses.
 - Tip-speed-ratio-dependent Cp, cut-in/cut-out protection and HAWT yaw-misalignment penalty.
 - Live RPM, available wind power, aerodynamic power, electrical output, Cp, estimated noise and accumulated energy.
+- Research-informed, illustrative acoustic estimates that allow the three concepts to be compared under the same selected operating conditions.
 - Calculated power, Cp, noise and wind-power-density envelopes.
 - HAWT/VAWT comparison and model transparency notes.
 
@@ -46,15 +47,18 @@ Turbulence is a deterministic multi-frequency gust approximation scaled by the s
 - **Electrical efficiency:** Electrical output divided by available wind power.
 - **Session energy:** Numerical integration of electrical output over simulation time; displayed in kWh.
 - **Performance plots:** Calculated from torque-balance operating points from 0 to 25 m/s. They are model outputs, not measured turbine curves.
-- **Noise:** Illustrative logarithmic combination of an assumed rotor-related source and ambient background. Not a certified acoustic prediction.
+- **Noise:** Illustrative logarithmic combination of an assumed rotor-related source and ambient background. The model applies a modestly lower source-level baseline to the VAWT concept and a speed-dependent reduction of up to 1.5 dB to the bio-inspired HAWT at higher rotational regimes. These are hypothesis-setting assumptions informed by selected literature, not measured outputs or validated correction factors. They are not certified acoustic predictions.
 
 ## Geometry and assumptions
-Both HAWT visual/reference dimensions use the 126 m rotor NREL 5-MW reference turbine scale. The whale-inspired HAWT adds illustrative leading-edge tubercles inspired by humpback whale flippers; this is a visual biomimetic concept, not a validated performance improvement. The VAWT uses an assumed 4.2 m radius and 18 m height for its projected two-panel swept area. VAWT dimensions and Cp are not measured.
+Both HAWT visual/reference dimensions use the 126 m rotor NREL 5-MW reference turbine scale. The whale-inspired HAWT adds illustrative leading-edge tubercles inspired by humpback whale flippers. Its aerodynamic power assumptions remain identical to the conventional HAWT so the current comparison isolates the acoustic hypothesis rather than claiming an energy-yield improvement. The VAWT uses an assumed 4.2 m radius and 18 m height for its projected two-panel swept area. VAWT dimensions and Cp are not measured.
 
 ## Scientific limitations
-This is an educational reduced-order model, not validated CFD, a certified digital twin or an engineering design tool.
+This is an educational reduced-order model, not validated CFD, a certified digital twin or an engineering design tool. The noise-reduction hypothesis is that even a small reduction in operational sound could improve acoustic comfort for residents living near wind-energy installations. The simulator explores that possibility; it does not establish a real-world community-noise benefit.
 - The custom VAWT has no validated measured Cp curve. Its Cp and direction-response functions are assumptions.
-- The whale-inspired HAWT uses the same reduced-order performance assumptions as the conventional HAWT. Its tubercle geometry is illustrative; no aerodynamic benefit is assumed or proven by this simulator.
+- The whale-inspired HAWT uses the same reduced-order power-performance assumptions as the conventional HAWT. Its tubercle geometry is illustrative; no aerodynamic or energy-yield benefit is assumed or proven by this simulator.
+- The acoustic model's lower VAWT baseline is informed by a published field comparison in which one 200 kW VAWT was near the quieter end of reported similar-sized HAWTs. This single comparison does not establish that VAWTs are always quieter.
+- The bio-HAWT acoustic adjustment is capped at an illustrative 1.5 dB and becomes active mainly at higher rotational regimes. Research on serrated wind-turbine blades supports the possibility of noise reductions in some conditions, but the tested geometries are not identical to this whale-tubercle design.
+- The tubercle-inspired marine propeller research cited below concerns underwater radiated noise. Its reported reductions must not be transferred directly to airborne wind turbines.
 - The HAWT is not a reproduction of the full NREL aero-servo-elastic model or its certified power curve.
 - Detailed blade-element aerodynamics, dynamic stall, drivetrain compliance, structural loads and turbine controller dynamics are not modelled.
 - Turbulence is a deterministic gust approximation, not a full atmospheric-boundary-layer model.
@@ -70,3 +74,7 @@ Do not use outputs for turbine sizing, safety, procurement or energy-yield guara
 3. Wind Toolkit Data Downloads. https://developer.nlr.gov/docs/wind/wind-toolkit/
 4. Berg (1988), *Aerodynamic Design and Initial Performance Measurements for the SANDIA 34-Metre Diameter VAWT*, SAND1989-2597C. https://www.sandia.gov/research/publications/details/aerodynamic-design-and-initial-performance-measurements-for-the-sandia-34-m-1990-01-01/
 5. U.S. Department of Energy, *Wind Turbine Sound*. https://www.energy.gov/cmei/systems/windexchange/sound
+6. Schmidt & Redonnet (2026), experimental aeroacoustics of bio-inspired serrated wind-turbine blades. https://link.springer.com/article/10.1186/s42774-025-00251-2
+7. Cao et al. (2022), research on trailing-edge serrations for wind-turbine airfoils. https://pubmed.ncbi.nlm.nih.gov/35232091/
+8. *Energies* (2016), 9(1), 19, field noise measurements of a 200 kW vertical-axis wind turbine. https://www.mdpi.com/1996-1073/9/1/19
+9. Humpback-whale-inspired tubercles on marine propellers (2021), CFD study of underwater radiated noise. https://pmc.ncbi.nlm.nih.gov/articles/PMC8424344/
