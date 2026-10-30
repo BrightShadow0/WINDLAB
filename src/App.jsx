@@ -8,9 +8,9 @@ function Scene({type,rpm,wind,direction,playing,view,yawMode,turbulence,timeScal
  useEffect(()=>{live.current={rpm,wind,direction,playing,yawMode,turbulence,timeScale};},[rpm,wind,direction,playing,yawMode,turbulence,timeScale]);
  useEffect(()=>{
   const el=host.current,scene=new THREE.Scene();scene.background=new THREE.Color('#07111d');scene.fog=new THREE.Fog('#07111d',28,90);
-  const camera=new THREE.PerspectiveCamera(38,el.clientWidth/el.clientHeight,.1,200);camera.position.set(17,13,23);cam.current=camera;
+  const camera=new THREE.PerspectiveCamera(38,el.clientWidth/el.clientHeight,.1,200);camera.position.set(17,17,23);cam.current=camera;
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(el.clientWidth,el.clientHeight);el.appendChild(renderer.domElement);
-  const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,6,0);
+  const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,8,0);
   scene.add(new THREE.HemisphereLight(0xa8cde2,0x182536,2));const light=new THREE.DirectionalLight(0xffffff,2.2);light.position.set(10,20,12);scene.add(light);scene.add(new THREE.GridHelper(60,30,0x24536a,0x173044));
   const steel=new THREE.MeshStandardMaterial({color:'#718b9d',metalness:.72,roughness:.3});
   const bladeFinish=new THREE.MeshStandardMaterial({color:type==='BIO_HAWT'?'#d8f0f2':'#dce7ef',metalness:.22,roughness:.3,side:THREE.DoubleSide});
@@ -110,7 +110,7 @@ function Scene({type,rpm,wind,direction,playing,view,yawMode,turbulence,timeScal
   const resize=()=>{camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();renderer.setSize(el.clientWidth,el.clientHeight);};const ro=new ResizeObserver(resize);ro.observe(el);
   return()=>{cancelAnimationFrame(frame);ro.disconnect();controls.dispose();renderer.dispose();el.removeChild(renderer.domElement);scene.traverse(o=>{o.geometry?.dispose();if(o.material)o.material.dispose();});};
  },[type]);
- useEffect(()=>{if(!cam.current)return;const positions={ORBIT:[17,13,23],FRONT:[0,8,30],TOP:[0,32,.1]};cam.current.position.set(...(positions[view]||positions.ORBIT));},[view]);
+ useEffect(()=>{if(!cam.current)return;const positions={ORBIT:[17,17,23],FRONT:[0,10,30],TOP:[0,34,.1]};cam.current.position.set(...(positions[view]||positions.ORBIT));},[view]);
  return <div className="scene" ref={host}><div className="scene-tag">● LIVE 3D MODEL <span>WIND VECTOR {direction}°</span></div></div>;
 }
 function DirectionDial({value,onChange}){
