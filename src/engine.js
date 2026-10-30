@@ -1,4 +1,4 @@
-export const DEFAULTS={wind:8.5,direction:0,turbulence:8,density:1.18,load:.75,yawMode:'auto',ambient:35,running:true,site:'india'};
+export const DEFAULTS={wind:8.5,direction:0,turbulence:8,density:1.18,load:.75,yawMode:'auto',ambient:35,running:false,site:'india'};
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),rad=d=>d*Math.PI/180,TWO_PI=2*Math.PI;
 const MODELS={HAWT:{radius:63,area:Math.PI*63**2,inertia:4.2e7,cutIn:3,cutOut:25,cpPeak:.46,tsrOpt:7.4,width:4.5,drive:.94,gen:.93,maxRpm:12.1,minRpm:6.9,responseTime:24,spinUpRpmPerSecond:.42},BIO_HAWT:{radius:63,area:Math.PI*63**2,inertia:4.2e7,cutIn:3,cutOut:25,cpPeak:.46,tsrOpt:7.4,width:4.5,drive:.94,gen:.93,maxRpm:12.1,minRpm:6.9,responseTime:24},VAWT:{radius:4.2,area:2*4.2*18,inertia:680,cutIn:2.5,cutOut:25,cpPeak:.31,tsrOpt:2.7,width:2.2,drive:.97,gen:.93,maxRpm:100,minRpm:8,responseTime:14,spinUpRpmPerSecond:3.2}};
 export const modelParameters=t=>MODELS[t]||MODELS.HAWT;
