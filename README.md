@@ -19,7 +19,7 @@ npm run preview
 - Wind speed (0–25 m/s), direction, turbulence intensity, air density and generator-load controls.
 - Selectable simulation time scale (1×, 2×, 5× or 10×) accelerates rotor dynamics, simulation time, energy integration and live graph sampling together.
 - Both HAWT variants support automatic yaw alignment and fixed-heading modes.
-- Rotor angular dynamics driven by aerodynamic torque, generator-load torque and mechanical losses.
+- Variable-speed rotor response based on each turbine's optimal tip-speed ratio, minimum/maximum RPM limits and response time.
 - Tip-speed-ratio-dependent Cp, cut-in/cut-out protection and HAWT yaw-misalignment penalty.
 - Live RPM, available wind power, aerodynamic power, electrical output, Cp, estimated noise and accumulated energy.
 - Research-informed, illustrative acoustic estimates that allow the three concepts to be compared under the same selected operating conditions.
@@ -35,7 +35,7 @@ Tip-speed ratio: `λ = ωR/v`
 
 Electrical output: `Pelectrical = Protor × ηdrive × ηgenerator × load fraction`
 
-Rotor torque balance: `J × dω/dt = Taero − Tgenerator − Tloss`
+Variable-speed rotor response: target RPM is derived from `TSRopt × wind speed ÷ rotor radius`, converted to RPM and bounded by the design's minimum and maximum operating speeds. A first-order response model moves the rotor smoothly toward this target.
 
 Cp is a bounded assumed function of tip-speed ratio. The HAWT Cp peak is below the Betz limit (0.593); the custom VAWT uses a lower assumed peak. Fixed-yaw HAWT operation applies a cosine-based misalignment penalty. VAWT directional response varies modestly with wind direction rather than being treated as perfectly omnidirectional.
 
@@ -51,7 +51,7 @@ Turbulence is a deterministic multi-frequency gust approximation scaled by the s
 - **Noise:** Illustrative logarithmic combination of an assumed rotor-related source and ambient background. The model deliberately assigns the highest reference source level to the conventional HAWT (46 dB), then the bio-inspired HAWT (43 dB), then the bio-inspired VAWT (41.5 dB). These explicit design offsets encode the project's hypothesis and are not measured differences or validated correction factors. The bio-HAWT also receives a speed-dependent reduction of up to 1.5 dB at higher rotational regimes. They are not certified acoustic predictions.
 
 ## Geometry and assumptions
-Both HAWT visual/reference dimensions use the 126 m rotor NREL 5-MW reference turbine scale. The whale-inspired HAWT adds illustrative leading-edge tubercles inspired by humpback whale flippers. Its aerodynamic power assumptions remain identical to the conventional HAWT so the current comparison isolates the acoustic hypothesis rather than claiming an energy-yield improvement. The VAWT uses an assumed 4.2 m radius and 18 m height for its projected two-panel swept area. VAWT dimensions and Cp are not measured.
+Both HAWT visual/reference dimensions use the 126 m rotor NREL 5-MW reference turbine scale. Their modeled variable-speed range is 6.9–12.1 RPM, following the reference turbine's practical operating range. The whale-inspired HAWT adds illustrative leading-edge tubercles inspired by humpback whale flippers. Its aerodynamic power assumptions remain identical to the conventional HAWT so the current comparison isolates the acoustic hypothesis rather than claiming an energy-yield improvement. The VAWT uses an assumed 4.2 m radius and 18 m height for its projected two-panel swept area. Its TSR target of 2.7 produces approximately 52 RPM at 8.5 m/s; the 8–100 RPM operating bounds and response time are illustrative assumptions. VAWT dimensions, RPM limits and Cp are not measured.
 
 ## Scientific limitations
 This is an educational reduced-order model, not validated CFD, a certified digital twin or an engineering design tool. The noise-reduction hypothesis is that even a small reduction in operational sound could improve acoustic comfort for residents living near wind-energy installations. The simulator explores that possibility; it does not establish a real-world community-noise benefit.
