@@ -35,7 +35,7 @@ function Scene({type,rpm,wind,direction,playing,view,yawMode}){
   for(let i=0;i<54;i++){const length=2.2+Math.random()*3.6,y=1.4+Math.random()*14.5,z=-9+Math.random()*18,x=-23+Math.random()*46;const streak=new THREE.Mesh(new THREE.BoxGeometry(length,.025,.025),i%4===0?glowMat:streakMatStrong);streak.position.set(x,y,z);streak.userData={speed:.7+Math.random()*.65,length};windField.add(streak);streaks.push(streak);}
   let fieldAngle=0,yawAngle=0,frame;const animate=()=>{frame=requestAnimationFrame(animate);controls.update();const d=live.current;if(d.playing)rotor.rotation[type==='HAWT'?'z':'y']+=d.rpm*Math.PI/1800;
    const target=THREE.MathUtils.degToRad(-d.direction);let delta=((target-fieldAngle+Math.PI*3)%(Math.PI*2))-Math.PI;fieldAngle+=delta*.075;windField.rotation.y=fieldAngle;
-   if(yawHead){const yawTarget=d.yawMode==='fixed'?0:THREE.MathUtils.degToRad(90-d.direction);let yawDelta=((yawTarget-yawAngle+Math.PI*3)%(Math.PI*2))-Math.PI;yawAngle+=yawDelta*Math.min(1,.012);yawHead.rotation.y=yawAngle;}
+   if(yawHead){const yawTarget=d.yawMode==='fixed'?0:THREE.MathUtils.degToRad(90-d.direction);let yawDelta=((yawTarget-yawAngle+Math.PI*3)%(Math.PI*2))-Math.PI;yawAngle+=yawDelta*Math.min(1,.006);yawHead.rotation.y=yawAngle;}
    const flow=.018+Math.max(0,d.wind)*.0025;
    for(const dot of particles){dot.position.x+=flow*dot.userData.speed;if(dot.position.x>25)dot.position.x=-25;}
    for(const line of streaks){line.position.x+=flow*line.userData.speed;if(line.position.x>25)line.position.x=-25-line.userData.length;}
