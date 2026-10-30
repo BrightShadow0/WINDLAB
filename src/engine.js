@@ -7,8 +7,9 @@ const directionFactor=d=>clamp(.86+.11*Math.cos(2*rad(d-18))+.03*Math.cos(4*rad(
 const yawFactor=(t,p)=>t==='VAWT'||p.yawMode!=='fixed'?1:Math.pow(Math.max(0,Math.cos(rad(Math.abs(((p.direction+180)%360)-180)))),1.88);
 export function effectiveWind(p,time=0){const intensity=clamp((p.turbulence||0)/100,0,.3),gust=.62*Math.sin(time*.32)+.38*Math.sin(time*.11+1.2);return Math.max(0,p.wind*(1+intensity*.18*gust));}
 function estimateAcousticLevel(type,p,{wind,rpm,tsr,cp,yawFactor:yaw}){ 
- const m=modelParameters(type),ambient=clamp(p.ambient??35,0,100);
- if(rpm<.15||wind<.3)return ambient;
+ const m=modelParameters(type);
+ // Turbine-only source estimate: no environmental ambient-noise contribution.
+ if(rpm<.15||wind<.3)return 0;
  // Research-informed trend estimator, not a BPM/FW-H aeroacoustic solver.
  // A 10% speed change maps to roughly 2-2.5 dB in this simplified model.
  const referenceRpm=m.tsrOpt*Math.max(wind,m.cutIn)/m.radius*60/TWO_PI;
@@ -29,7 +30,7 @@ function estimateAcousticLevel(type,p,{wind,rpm,tsr,cp,yawFactor:yaw}){
  const bioHawtReduction=type==='BIO_HAWT'?1.5*clamp((speedRatio-.85)/.45,0,1):0;
  const designBaseline=type==='VAWT'?41.5:type==='BIO_HAWT'?43:46;
  const sourceDb=clamp(designBaseline+rotorSpeedEffect+windEffect+turbulenceEffect+cpEffect+yawEffect+dynamicStallEffect-bioHawtReduction,25,75);
- return 10*Math.log10(Math.pow(10,ambient/10)+Math.pow(10,sourceDb/10));
+ return sourceDb;
 }
 export function evaluate(type,p,state={omega:0},time=0){const m=modelParameters(type),v=effectiveWind(p,time),rho=clamp(p.density||1.225,.8,1.4),omega=Math.max(0,state.omega||0),shutdown=v<m.cutIn||v>=m.cutOut,windPower=.5*rho*m.area*v**3,tsr=v>0?omega*m.radius/v:0,yaw=yawFactor(type,p),direction=type==='VAWT'?directionFactor(p.direction):1,cp=shutdown?0:cpAt(tsr,type)*yaw*direction,rotorPower=windPower*cp,etaDrive=m.drive,etaGen=m.gen,electrical=shutdown?0:rotorPower*etaDrive*etaGen*clamp(p.load,0,1),rpm=omega*60/TWO_PI,tipSpeed=omega*m.radius,noise=estimateAcousticLevel(type,p,{wind:v,rpm,tsr,cp,yawFactor:yaw});return{type,area:m.area,windPower,rotorPower,electrical,cp,etaDrive,etaGen,rpm,omega,tsr,yawFactor:yaw,directionFactor:direction,tipSpeed,noise,shutdown,cutIn:m.cutIn,cutOut:m.cutOut,wind:v};}
 export function stepRotor(type,p,previous,dt,time=0){const m=modelParameters(type),steps=Math.max(1,Math.ceil(Math.max(0,dt)/.02)),h=Math.max(0,dt)/steps;let omega=Math.max(0,previous.omega||0);for(let i=0;i<steps;i++){const v=effectiveWind(p,time+i*h);if(v<m.cutIn||v>=m.cutOut){omega*=Math.exp(-4*h);continue;}const rho=clamp(p.density||1.225,.8,1.4),windPower=.5*rho*m.area*v**3,tsr=omega*m.radius/Math.max(v,.1),cp=cpAt(tsr,type)*yawFactor(type,p)*(type==='VAWT'?directionFactor(p.direction):1),aeroPower=windPower*cp,target=m.tsrOpt*v/m.radius,startTorque=.06*.5*rho*m.area*m.radius*v*v*(type!=='VAWT'?yawFactor(type,p):directionFactor(p.direction)),aeroTorque=Math.max(aeroPower/Math.max(omega,.35),startTorque),generatorTorque=clamp(p.load,0,1)*aeroPower/Math.max(target,.35)*clamp(omega/Math.max(target,.1),0,1.5),loss=omega*(type!=='VAWT'?1800:1.8),alpha=(aeroTorque-generatorTorque-loss)/m.inertia;omega=clamp(omega+alpha*h,0,m.maxRpm*TWO_PI/60*1.15);}return{omega};}
