@@ -4,7 +4,7 @@ const MODELS={HAWT:{radius:63,area:Math.PI*63**2,inertia:4.2e7,cutIn:3,cutOut:25
 export const modelParameters=t=>MODELS[t]||MODELS.HAWT;
 const cpAt=(tsr,t)=>{const m=modelParameters(t);return clamp(m.cpPeak*Math.exp(-Math.pow((tsr-m.tsrOpt)/m.width,2))*(1-Math.exp(-Math.max(0,tsr)/1.15)),0,t!=='VAWT'?.593:.45);};
 const directionFactor=d=>clamp(.86+.11*Math.cos(2*rad(d-18))+.03*Math.cos(4*rad(d)),.68,1);
-const yawFactor=(t,p)=>t!=='HAWT'||p.yawMode!=='fixed'?1:Math.pow(Math.max(0,Math.cos(rad(Math.abs(((p.direction+180)%360)-180)))),1.88);
+const yawFactor=(t,p)=>t==='VAWT'||p.yawMode!=='fixed'?1:Math.pow(Math.max(0,Math.cos(rad(Math.abs(((p.direction+180)%360)-180)))),1.88);
 export function effectiveWind(p,time=0){const intensity=clamp((p.turbulence||0)/100,0,.3),gust=.62*Math.sin(time*.32)+.38*Math.sin(time*.11+1.2);return Math.max(0,p.wind*(1+intensity*.18*gust));}
 function estimateAcousticLevel(type,p,{wind,rpm,tsr,cp,yawFactor:yaw}){ 
  const m=modelParameters(type),ambient=clamp(p.ambient??35,0,100);
