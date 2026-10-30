@@ -27,7 +27,7 @@ function estimateAcousticLevel(type,p,{wind,rpm,tsr,cp,yawFactor:yaw}){
  // Bio-HAWT benefit is activated mainly at higher rotational regimes, consistent
  // with 2026 wind-turbine serration experiments; the effect is geometry-dependent.
  const bioHawtReduction=type==='BIO_HAWT'?1.5*clamp((speedRatio-.85)/.45,0,1):0;
- const sourceDb=clamp((type==='VAWT'?42:44)+rotorSpeedEffect+windEffect+turbulenceEffect+cpEffect+yawEffect+dynamicStallEffect-bioHawtReduction,25,75);
+ const designBaseline=type==='VAWT'?41.5:type==='BIO_HAWT'?43:46;\n const sourceDb=clamp(designBaseline+rotorSpeedEffect+windEffect+turbulenceEffect+cpEffect+yawEffect+dynamicStallEffect-bioHawtReduction,25,75);
  return 10*Math.log10(Math.pow(10,ambient/10)+Math.pow(10,sourceDb/10));
 }
 export function evaluate(type,p,state={omega:0},time=0){const m=modelParameters(type),v=effectiveWind(p,time),rho=clamp(p.density||1.225,.8,1.4),omega=Math.max(0,state.omega||0),shutdown=v<m.cutIn||v>=m.cutOut,windPower=.5*rho*m.area*v**3,tsr=v>0?omega*m.radius/v:0,yaw=yawFactor(type,p),direction=type==='VAWT'?directionFactor(p.direction):1,cp=shutdown?0:cpAt(tsr,type)*yaw*direction,rotorPower=windPower*cp,etaDrive=m.drive,etaGen=m.gen,electrical=shutdown?0:rotorPower*etaDrive*etaGen*clamp(p.load,0,1),rpm=omega*60/TWO_PI,tipSpeed=omega*m.radius,noise=estimateAcousticLevel(type,p,{wind:v,rpm,tsr,cp,yawFactor:yaw});return{type,area:m.area,windPower,rotorPower,electrical,cp,etaDrive,etaGen,rpm,omega,tsr,yawFactor:yaw,directionFactor:direction,tipSpeed,noise,shutdown,cutIn:m.cutIn,cutOut:m.cutOut,wind:v};}
