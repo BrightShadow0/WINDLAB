@@ -12,7 +12,7 @@ function Scene({type,rpm,wind,direction,playing,view,yawMode,turbulence}){
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(el.clientWidth,el.clientHeight);el.appendChild(renderer.domElement);
   const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,6,0);
   scene.add(new THREE.HemisphereLight(0xa8cde2,0x182536,2));const light=new THREE.DirectionalLight(0xffffff,2.2);light.position.set(10,20,12);scene.add(light);scene.add(new THREE.GridHelper(60,30,0x24536a,0x173044));
-  const steel=new THREE.MeshStandardMaterial({color:'#526a7c',metalness:.65,roughness:.4}),orange=new THREE.MeshStandardMaterial({color:'#f36b35',metalness:.2,roughness:.4,side:THREE.DoubleSide}),dark=new THREE.MeshStandardMaterial({color:'#172c3d',metalness:.5});
+  const steel=new THREE.MeshStandardMaterial({color:'#526a7c',metalness:.65,roughness:.4}),orange=new THREE.MeshStandardMaterial({color:'#b9d9dc',metalness:.42,roughness:.3,side:THREE.DoubleSide}),dark=new THREE.MeshStandardMaterial({color:'#172c3d',metalness:.5});
   const root=new THREE.Group();scene.add(root);const cyl=(a,b,h,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.CylinderGeometry(a,b,h,32),m);o.position.set(x,y,z);root.add(o);return o;};
   let rotor=new THREE.Group();root.add(rotor);let yawHead=null;
   const isHawt=type!=='VAWT';
