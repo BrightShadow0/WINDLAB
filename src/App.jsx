@@ -12,40 +12,42 @@ function Scene({type,rpm,wind,direction,playing,view,yawMode,turbulence,timeScal
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(el.clientWidth,el.clientHeight);el.appendChild(renderer.domElement);
   const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,6,0);
   scene.add(new THREE.HemisphereLight(0xa8cde2,0x182536,2));const light=new THREE.DirectionalLight(0xffffff,2.2);light.position.set(10,20,12);scene.add(light);scene.add(new THREE.GridHelper(60,30,0x24536a,0x173044));
-  const steel=new THREE.MeshStandardMaterial({color:'#526a7c',metalness:.65,roughness:.4}),orange=new THREE.MeshStandardMaterial({color:'#b9d9dc',metalness:.42,roughness:.3,side:THREE.DoubleSide}),dark=new THREE.MeshStandardMaterial({color:'#172c3d',metalness:.5});
-  const root=new THREE.Group();scene.add(root);const cyl=(a,b,h,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.CylinderGeometry(a,b,h,32),m);o.position.set(x,y,z);root.add(o);return o;};
+  const steel=new THREE.MeshStandardMaterial({color:'#718b9d',metalness:.72,roughness:.3});
+  const bladeFinish=new THREE.MeshStandardMaterial({color:type==='BIO_HAWT'?'#d8f0f2':'#dce7ef',metalness:.22,roughness:.3,side:THREE.DoubleSide});
+  const dark=new THREE.MeshStandardMaterial({color:'#263e50',metalness:.58,roughness:.34});
+  const accent=new THREE.MeshStandardMaterial({color:'#45c6df',metalness:.35,roughness:.28});
+  const root=new THREE.Group();scene.add(root);
+  const cyl=(top,bottom,height,material,x,y,z)=>{const o=new THREE.Mesh(new THREE.CylinderGeometry(top,bottom,height,48),material);o.position.set(x,y,z);root.add(o);return o;};
   let rotor=new THREE.Group();root.add(rotor);let yawHead=null;
   const isHawt=type!=='VAWT';
-  const bladeMat=new THREE.MeshStandardMaterial({color:type==='BIO_HAWT'?'#dce9e8':'#d9e3e9',metalness:.28,roughness:.34,side:THREE.DoubleSide});
-  const bioAccent=new THREE.MeshStandardMaterial({color:'#42c7c9',metalness:.25,roughness:.32,side:THREE.DoubleSide});
   const makeBlade=(bio=false)=>{
-   const group=new THREE.Group(),positions=[],indices=[],rows=48,cols=12,r0=.62,r1=8.05;
-   for(let side=0;side<2;side++){
-    const offset=positions.length/3;
-    for(let i=0;i<=rows;i++){const t=i/rows,r=r0+(r1-r0)*t,chord=1.12*(1-.76*t)+.12;
-     for(let j=0;j<=cols;j++){const u=j/cols,thickness=.105*Math.pow(1-t,.55)*Math.sin(Math.PI*u),camber=.035*Math.sin(Math.PI*u)*(1-t*.25);
-      const tubercle = bio ? 0.14 * Math.sin((r-r0) * Math.PI * 2 / 1.25) * Math.exp(-u * 10) : 0;
-      const x=(u-.28)*chord+tubercle,z=(side===0?1:-1)*(thickness+camber);
-      positions.push(x,r,z);
-     }
+   const group=new THREE.Group(),positions=[],indices=[],rows=64,cols=18,r0=.72,r1=8.05;
+   for(let side=0;side<2;side++){const offset=positions.length/3;
+    for(let i=0;i<=rows;i++){const t=i/rows,r=r0+(r1-r0)*t,chord=.20+1.02*Math.pow(1-t,.72),sweep=.12*Math.sin(t*Math.PI*.85)+.22*t*t,twist=(1-t)*.19;
+     for(let j=0;j<=cols;j++){const u=j/cols,thickness=(.13*Math.pow(1-t,.55)+.008)*Math.sin(Math.PI*u),camber=.045*Math.sin(Math.PI*u)*(1-t*.3),tubercle=bio?.11*Math.sin((r-r0)*Math.PI*2/1.18)*Math.exp(-u*9):0,chordPos=(u-.3)*chord+sweep+tubercle,sectionZ=(side===0?1:-1)*(thickness+camber);positions.push(sectionZ*Math.cos(twist),r,chordPos+sectionZ*Math.sin(twist));}
     }
     for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){const q=offset+i*(cols+1)+j,n=q+cols+1;if(side===0)indices.push(q,n,q+1,q+1,n,n+1);else indices.push(q,q+1,n,q+1,n+1,n);}
    }
-   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setIndex(indices);geo.computeVertexNormals();
-   group.add(new THREE.Mesh(geo,bladeMat));
-
-   return group;
+   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setIndex(indices);geo.computeVertexNormals();group.add(new THREE.Mesh(geo,bladeFinish));
+   const rootFairing=new THREE.Mesh(new THREE.SphereGeometry(.3,20,16),bladeFinish);rootFairing.position.y=.68;group.add(rootFairing);return group;
   };
   if(isHawt){
-   cyl(.28,.5,8,steel,0,4,0);yawHead=new THREE.Group();yawHead.position.set(0,8.1,0);root.add(yawHead);
-   const nac=new THREE.Mesh(new THREE.BoxGeometry(3.8,1.1,1.3),dark);yawHead.add(nac);
-   const nacelleCap=new THREE.Mesh(new THREE.CylinderGeometry(.58,.58,1.45,32),steel);nacelleCap.rotation.x=Math.PI/2;nacelleCap.position.set(1.45,0,0);yawHead.add(nacelleCap);
-   rotor.position.set(0,0,1);yawHead.add(rotor);
-   rotor.add(new THREE.Mesh(new THREE.SphereGeometry(.58,32,24),steel));
-   for(let i=0;i<3;i++){const angle=i*Math.PI*2/3,blade=makeBlade(type==='BIO_HAWT');blade.rotation.z=-angle;rotor.add(blade);}
+   cyl(.34,.58,10.5,steel,0,5.25,0);
+   const towerBase=new THREE.Mesh(new THREE.CylinderGeometry(.58,.68,.18,48),dark);towerBase.position.y=.09;root.add(towerBase);
+   yawHead=new THREE.Group();yawHead.position.set(0,10.5,0);root.add(yawHead);
+   const nacelle=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),dark);nacelle.scale.set(2.35,.58,.72);nacelle.position.set(-.25,.05,0);yawHead.add(nacelle);
+   const rearHousing=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),steel);rearHousing.scale.set(.72,.43,.53);rearHousing.position.set(-1.85,.04,0);yawHead.add(rearHousing);
+   const roof=new THREE.Mesh(new THREE.BoxGeometry(2.1,.06,.78),steel);roof.position.set(-.25,.59,0);yawHead.add(roof);
+   const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,1.2,32),steel);shaft.rotation.z=Math.PI/2;shaft.position.x=1.65;yawHead.add(shaft);
+   rotor.position.set(2.35,0,0);yawHead.add(rotor);
+   const hub=new THREE.Mesh(new THREE.SphereGeometry(.72,36,28),steel);rotor.add(hub);
+   const spinner=new THREE.Mesh(new THREE.ConeGeometry(.62,1.25,40),bladeFinish);spinner.rotation.z=-Math.PI/2;spinner.position.x=.72;rotor.add(spinner);
+   for(let i=0;i<3;i++){const blade=makeBlade(type==='BIO_HAWT');blade.rotation.x=i*Math.PI*2/3;rotor.add(blade);}
+   const bearing=new THREE.Mesh(new THREE.CylinderGeometry(.72,.72,.28,40),accent);bearing.position.y=10.45;root.add(bearing);
+   const platform=new THREE.Mesh(new THREE.BoxGeometry(2.2,.12,1.55),steel);platform.position.set(-.15,10.02,0);root.add(platform);
   }else{
    cyl(.22,.22,15,steel,0,8,0);cyl(.75,.75,1.2,dark,0,.8,0);rotor.position.y=8;
-   for(let i=0;i<2;i++){const blade=new THREE.Group();blade.rotation.y=i*Math.PI;const pos=[],idx=[];const rows=36,cols=8,H=7.4,W=1.35;for(let r=0;r<=rows;r++){const t=r/rows,y=(t-.5)*H,twist=t*Math.PI*.75;for(let c=0;c<=cols;c++){const u=(c/cols-.5)*W;pos.push(2+u*Math.cos(twist),y,u*Math.sin(twist));}}for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const a=r*(cols+1)+c,b=a+cols+1;idx.push(a,b,a+1,b,b+1,a+1);}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();blade.add(new THREE.Mesh(g,orange));rotor.add(blade);}
+   for(let i=0;i<2;i++){const blade=new THREE.Group();blade.rotation.y=i*Math.PI;const pos=[],idx=[];const rows=36,cols=8,H=7.4,W=1.35;for(let r=0;r<=rows;r++){const t=r/rows,y=(t-.5)*H,twist=t*Math.PI*.75;for(let c=0;c<=cols;c++){const u=(c/cols-.5)*W;pos.push(2+u*Math.cos(twist),y,u*Math.sin(twist));}}for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const a=r*(cols+1)+c,b=a+cols+1;idx.push(a,b,a+1,b,b+1,a+1);}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();blade.add(new THREE.Mesh(g,bladeFinish));rotor.add(blade);}
    for(const y of [4.2,11.8]){const arm=new THREE.Mesh(new THREE.BoxGeometry(5,.18,.22),steel);arm.position.y=y;root.add(arm);}
   }
   const windField=new THREE.Group();scene.add(windField);
@@ -57,7 +59,7 @@ function Scene({type,rpm,wind,direction,playing,view,yawMode,turbulence,timeScal
   const streaks=[];
   const streakMatStrong=new THREE.MeshBasicMaterial({color:'#62e7f2',transparent:true,opacity:.72});
   for(let i=0;i<54;i++){const length=2.2+Math.random()*3.6,y=1.4+Math.random()*14.5,z=-9+Math.random()*18,x=-23+Math.random()*46;const streak=new THREE.Mesh(new THREE.BoxGeometry(length,.025,.025),i%4===0?glowMat:streakMatStrong);streak.position.set(x,y,z);streak.userData={speed:.7+Math.random()*.65,length};windField.add(streak);streaks.push(streak);}
-  let fieldAngle=0,yawAngle=0,frame,elapsed=0;const animate=()=>{frame=requestAnimationFrame(animate);controls.update();const d=live.current;elapsed+=.016;if(d.playing)rotor.rotation[isHawt?'z':'y']+=d.rpm*Math.PI/1800*.60*d.timeScale;
+  let fieldAngle=0,yawAngle=0,frame,elapsed=0;const animate=()=>{frame=requestAnimationFrame(animate);controls.update();const d=live.current;elapsed+=.016;if(d.playing)rotor.rotation[isHawt?'x':'y']+=d.rpm*Math.PI/1800*.60*d.timeScale;
    const target=THREE.MathUtils.degToRad(d.direction+90);let delta=((target-fieldAngle+Math.PI*3)%(Math.PI*2))-Math.PI;fieldAngle+=delta*.075;windField.rotation.y=fieldAngle;
    if(yawHead){const yawTarget=d.yawMode==='fixed'?0:THREE.MathUtils.degToRad(d.direction);let yawDelta=((yawTarget-yawAngle+Math.PI*3)%(Math.PI*2))-Math.PI;yawAngle+=yawDelta*Math.min(1,.007);yawHead.rotation.y=yawAngle;}
    const flow=.018+Math.max(0,d.wind)*.0025;
