@@ -1,4 +1,4 @@
-# WINDLAB
+# WindLab by BrightShadow
 ### Interactive 3D Wind-Turbine Simulation and Comparative Analysis
 
 WINDLAB is an educational, hypothesis-driven simulator comparing a conventional three-bladed horizontal-axis wind turbine (HAWT), a whale-tubercle-inspired three-bladed HAWT, and a custom two-panel twisted vertical-axis wind turbine (VAWT). Its central research question is whether bio-inspired blade geometries could reduce operational noise while retaining useful energy-generation performance. It combines an interactive Three.js scene, adjustable wind conditions, reduced-order rotor dynamics, live telemetry and dynamically generated performance plots. The acoustic differences are theoretical model assumptions for exploration, not experimentally validated claims.
@@ -16,14 +16,17 @@ npm run preview
 
 ## Features
 - Interactive conventional three-blade HAWT, whale-tubercle-inspired three-blade HAWT, and two opposing twisted VAWT panels with orbit, zoom and camera views.
-- Wind speed (0–25 m/s), direction, turbulence intensity, air density and generator-load controls.
+- Wind speed (0–25 m/s), 360° wind direction dial, turbulence intensity, air density and generator-load controls.
+- India reference site presets for an assumed onshore baseline, Khavda (Kutch) and Damodara (Jaisalmer); preset values are illustrative where site-specific measurements are not supplied.
 - Selectable simulation time scale (1×, 2×, 5× or 10×) accelerates rotor dynamics, simulation time, energy integration and live graph sampling together.
 - Both HAWT variants support automatic yaw alignment and fixed-heading modes.
 - Variable-speed rotor response based on each turbine's optimal tip-speed ratio, minimum/maximum RPM limits and response time.
 - Tip-speed-ratio-dependent Cp, cut-in/cut-out protection and HAWT yaw-misalignment penalty.
-- Live RPM, available wind power, aerodynamic power, electrical output, Cp, estimated noise and accumulated energy.
+- Live RPM, available wind power, aerodynamic power, electrical output, Cp, turbine-only estimated noise and accumulated energy.
+- Rolling live time-history plots for power, RPM, Cp, estimated noise and wind speed; plots pause, resume and clear with the simulation.
+- Pause-time operating-state snapshot with final wind, electrical output, turbine-only noise, rotor RPM and Cp readings.
 - Research-informed, illustrative acoustic estimates that allow the three concepts to be compared under the same selected operating conditions.
-- Calculated power, Cp, noise and wind-power-density envelopes.
+- Side-by-side analysis of electrical output and estimated turbine noise under the same selected environmental conditions.
 - HAWT/VAWT comparison and model transparency notes.
 
 ## Model equations
@@ -47,8 +50,8 @@ Turbulence is a deterministic multi-frequency gust approximation scaled by the s
 - **Electrical output:** Rotor power multiplied by drivetrain efficiency, generator efficiency and load fraction.
 - **Electrical efficiency:** Electrical output divided by available wind power.
 - **Session energy:** Numerical integration of electrical output over simulation time; displayed in kWh.
-- **Performance plots:** Calculated from torque-balance operating points from 0 to 25 m/s. They are model outputs, not measured turbine curves.
-- **Noise:** Illustrative logarithmic combination of an assumed rotor-related source and ambient background. The model deliberately assigns the highest reference source level to the conventional HAWT (46 dB), then the bio-inspired HAWT (43 dB), then the bio-inspired VAWT (41.5 dB). These explicit design offsets encode the project's hypothesis and are not measured differences or validated correction factors. The bio-HAWT also receives a speed-dependent reduction of up to 1.5 dB at higher rotational regimes. They are not certified acoustic predictions.
+- **Live performance plots:** Rolling time histories sampled from the current simulation outputs. They show calculated model behaviour, not measured turbine curves.
+- **Noise:** Turbine-only estimated source level in dBA. No environmental ambient-noise floor is added. The estimate responds to rotor RPM relative to its design reference speed, wind speed, turbulence, Cp, HAWT yaw misalignment and a low-TSR dynamic-stall proxy for the VAWT. A stationary rotor returns zero modeled operational contribution; this is a simulation convention, not a claim of physically measurable 0 dBA. Reference offsets are 46 dB (HAWT), 43 dB (bio-HAWT) and 41.5 dB (bio-VAWT), deliberately encoding the project's hypothesis that the conventional HAWT may be noisier. These are illustrative assumptions, not measured differences or universal rankings. The bio-HAWT receives an additional speed-dependent reduction of up to 1.5 dB at higher rotational regimes. Displayed values are comparative model estimates, not certified acoustic predictions.
 
 ## Geometry and assumptions
 Both HAWT visual/reference dimensions use the 126 m rotor NREL 5-MW reference turbine scale. Their modeled variable-speed range is 6.9–12.1 RPM, following the reference turbine's practical operating range. The whale-inspired HAWT adds illustrative leading-edge tubercles inspired by humpback whale flippers. Its aerodynamic power assumptions remain identical to the conventional HAWT so the current comparison isolates the acoustic hypothesis rather than claiming an energy-yield improvement. The VAWT uses an assumed 4.2 m radius and 18 m height for its projected two-panel swept area. Its TSR target of 2.7 produces approximately 52 RPM at 8.5 m/s; the 8–100 RPM operating bounds and response time are illustrative assumptions. VAWT dimensions, RPM limits and Cp are not measured.
@@ -63,11 +66,14 @@ This is an educational reduced-order model, not validated CFD, a certified digit
 - The HAWT is not a reproduction of the full NREL aero-servo-elastic model or its certified power curve.
 - Detailed blade-element aerodynamics, dynamic stall, drivetrain compliance, structural loads and turbine controller dynamics are not modelled.
 - Turbulence is a deterministic gust approximation, not a full atmospheric-boundary-layer model.
-- Noise does not include validated source data, propagation, distance, terrain, directivity or environmental ambient noise.
+- Noise does not include validated source data, sound propagation, receiver distance, terrain, directivity or environmental ambient noise. It represents a simplified turbine-only source estimate, not sound at a nearby residence.
 - Animated airflow particles are visual cues, not CFD streamlines.
 - A fair comparison requires matched swept area, scale, operating constraints and validated turbine-specific data.
 
 Do not use outputs for turbine sizing, safety, procurement or energy-yield guarantees.
+
+## Project identity
+WindLab is presented as **WindLab by BrightShadow**. The application header carries the creator attribution; the footer remains focused on the simulation.
 
 ## References
 1. Jonkman et al. (2009), *Definition of a 5-MW Reference Wind Turbine for Offshore System Development*, NREL/TP-500-38060. https://www.nrel.gov/docs/fy09osti/38060.pdf
