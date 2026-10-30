@@ -110,7 +110,7 @@ function Scene({type,rpm,wind,direction,playing,view,yawMode,turbulence,timeScal
   const resize=()=>{camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();renderer.setSize(el.clientWidth,el.clientHeight);};const ro=new ResizeObserver(resize);ro.observe(el);
   return()=>{cancelAnimationFrame(frame);ro.disconnect();controls.dispose();renderer.dispose();el.removeChild(renderer.domElement);scene.traverse(o=>{o.geometry?.dispose();if(o.material)o.material.dispose();});};
  },[type]);
- useEffect(()=>{if(!cam.current)return;const positions={ORBIT:[17,17,23],FRONT:[0,10,30],TOP:[0,34,.1]};cam.current.position.set(...(positions[view]||positions.ORBIT));},[view]);
+ useEffect(()=>{if(!cam.current)return;const positions={ORBIT:[17,17,23],FRONT:[30,10,0],TOP:[0,34,.1]};cam.current.position.set(...(positions[view]||positions.ORBIT));},[view]);
  return <div className="scene" ref={host}><div className="scene-tag">● LIVE 3D MODEL <span>WIND VECTOR {direction}°</span></div></div>;
 }
 function DirectionDial({value,onChange}){
