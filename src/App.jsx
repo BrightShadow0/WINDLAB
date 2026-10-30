@@ -4,8 +4,8 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {DEFAULTS,evaluate,stepRotor,buildSweep} from './engine.js';
 
 function Scene({type,rpm,wind,direction,playing,view}){
- const host=useRef(null),cam=useRef(null),live=useRef({rpm,wind,playing});
- useEffect(()=>{live.current={rpm,wind,playing};},[rpm,wind,playing]);
+ const host=useRef(null),cam=useRef(null),live=useRef({rpm,wind,direction,playing});
+ useEffect(()=>{live.current={rpm,wind,direction,playing};},[rpm,wind,direction,playing]);
  useEffect(()=>{
   const el=host.current,scene=new THREE.Scene();scene.background=new THREE.Color('#07111d');scene.fog=new THREE.Fog('#07111d',28,90);
   const camera=new THREE.PerspectiveCamera(38,el.clientWidth/el.clientHeight,.1,200);camera.position.set(17,13,23);cam.current=camera;
@@ -24,8 +24,20 @@ function Scene({type,rpm,wind,direction,playing,view}){
    for(let i=0;i<2;i++){const blade=new THREE.Group();blade.rotation.y=i*Math.PI;const pos=[],idx=[];const rows=36,cols=8,H=7.4,W=1.35;for(let r=0;r<=rows;r++){const t=r/rows,y=(t-.5)*H,twist=t*Math.PI*.75;for(let c=0;c<=cols;c++){const u=(c/cols-.5)*W;pos.push(2+u*Math.cos(twist),y,u*Math.sin(twist));}}for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const a=r*(cols+1)+c,b=a+cols+1;idx.push(a,b,a+1,b,b+1,a+1);}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();blade.add(new THREE.Mesh(g,orange));rotor.add(blade);}
    for(const y of [4.2,11.8]){const arm=new THREE.Mesh(new THREE.BoxGeometry(5,.18,.22),steel);arm.position.y=y;root.add(arm);}
   }
-  const particles=new THREE.Group();scene.add(particles);const pm=new THREE.MeshBasicMaterial({color:'#35c5d6'});for(let i=0;i<32;i++){const dot=new THREE.Mesh(new THREE.SphereGeometry(.045,8,8),pm);dot.position.set(-18+Math.random()*36,2+Math.random()*13,-8+Math.random()*16);particles.add(dot);}
-  let frame;const animate=()=>{frame=requestAnimationFrame(animate);controls.update();const d=live.current;if(d.playing)rotor.rotation[type==='HAWT'?'z':'y']+=d.rpm*Math.PI/1800;for(const dot of particles.children){dot.position.x+=.035+d.wind*.002;if(dot.position.x>20)dot.position.x=-20;}renderer.render(scene,camera);};animate();
+  const windField=new THREE.Group();scene.add(windField);
+  const particleMat=new THREE.MeshBasicMaterial({color:'#55d9e8',transparent:true,opacity:.82});
+  const streakMat=new THREE.LineBasicMaterial({color:'#48cbdc',transparent:true,opacity:.38});
+  const glowMat=new THREE.LineBasicMaterial({color:'#8beaf1',transparent:true,opacity:.2});
+  const particles=[];
+  for(let i=0;i<112;i++){const dot=new THREE.Mesh(new THREE.SphereGeometry(i%5===0?.065:.038,8,8),particleMat);dot.position.set(-23+Math.random()*46,1.2+Math.random()*15,-10+Math.random()*20);dot.userData={speed:.65+Math.random()*1.15};windField.add(dot);particles.push(dot);}
+  const streaks=[];
+  for(let i=0;i<38;i++){const length=1.2+Math.random()*3.2,y=1.4+Math.random()*14.5,z=-9+Math.random()*18,x=-23+Math.random()*46;const geometry=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x,y,z),new THREE.Vector3(x+length,y,z)]);const line=new THREE.Line(geometry,i%4===0?glowMat:streakMat);line.userData={speed:.85+Math.random()*1.3,length};windField.add(line);streaks.push(line);}
+  let fieldAngle=0,frame;const animate=()=>{frame=requestAnimationFrame(animate);controls.update();const d=live.current;if(d.playing)rotor.rotation[type==='HAWT'?'z':'y']+=d.rpm*Math.PI/1800;
+   const target=THREE.MathUtils.degToRad(-d.direction);let delta=((target-fieldAngle+Math.PI*3)%(Math.PI*2))-Math.PI;fieldAngle+=delta*.075;windField.rotation.y=fieldAngle;
+   const flow=.045+Math.max(0,d.wind)*.006;
+   for(const dot of particles){dot.position.x+=flow*dot.userData.speed;if(dot.position.x>25)dot.position.x=-25;}
+   for(const line of streaks){line.position.x+=flow*line.userData.speed;if(line.position.x>25)line.position.x=-25-line.userData.length;}
+   renderer.render(scene,camera);};animate();
   const resize=()=>{camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();renderer.setSize(el.clientWidth,el.clientHeight);};const ro=new ResizeObserver(resize);ro.observe(el);
   return()=>{cancelAnimationFrame(frame);ro.disconnect();controls.dispose();renderer.dispose();el.removeChild(renderer.domElement);scene.traverse(o=>{o.geometry?.dispose();if(o.material)o.material.dispose();});};
  },[type]);
