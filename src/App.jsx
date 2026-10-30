@@ -24,7 +24,7 @@ function Scene({type,rpm,wind,direction,playing,view,yawMode,turbulence}){
     const offset=positions.length/3;
     for(let i=0;i<=rows;i++){const t=i/rows,r=r0+(r1-r0)*t,chord=1.12*(1-.76*t)+.12;
      for(let j=0;j<=cols;j++){const u=j/cols,thickness=.105*Math.pow(1-t,.55)*Math.sin(Math.PI*u),camber=.035*Math.sin(Math.PI*u)*(1-t*.25);
-      const tubercle=bio?.22*Math.sin((r-r0)*Math.PI*2/1.18)*Math.exp(-u*8):0;
+      const tubercle=bio ? 0.14*Math.sin((r-r0)*Math.PI*2/1.25)*Math.exp(-u*10) : 0;
       const x=(u-.28)*chord+tubercle,z=(side===0?1:-1)*(thickness+camber);
       positions.push(x,r,z);
      }
@@ -33,7 +33,7 @@ function Scene({type,rpm,wind,direction,playing,view,yawMode,turbulence}){
    }
    const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setIndex(indices);geo.computeVertexNormals();
    group.add(new THREE.Mesh(geo,bladeMat));
-   if(bio){const edge=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(Array.from({length:45},(_,i)=>{const t=i/44,r=r0+(r1-r0)*t,x=-.28*(1.12*(1-.76*t)+.12)+.22*Math.sin((r-r0)*Math.PI*2/1.18);return new THREE.Vector3(x,r,.015);})),.035,6,false),bioAccent);group.add(edge);}
+   if(bio){const edge=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(Array.from({length:45},(_,i)=>{const t=i/44,r=r0+(r1-r0)*t,x=-.28*(1.12*(1-.76*t)+.12)+.14*Math.sin((r-r0)*Math.PI*2/1.25);return new THREE.Vector3(x,r,.015);})),.035,6,false),bioAccent);group.add(edge);}
    return group;
   };
   if(isHawt){
