@@ -1,6 +1,6 @@
 export const DEFAULTS={wind:8.5,direction:0,turbulence:8,density:1.18,load:.75,yawMode:'auto',ambient:35,running:true,site:'india'};
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),rad=d=>d*Math.PI/180,TWO_PI=2*Math.PI;
-const MODELS={HAWT:{radius:63,area:Math.PI*63**2,inertia:4.2e7,cutIn:3,cutOut:25,cpPeak:.46,tsrOpt:7.4,width:4.5,drive:.94,gen:.93,maxRpm:12.1,minRpm:6.9,responseTime:24},BIO_HAWT:{radius:63,area:Math.PI*63**2,inertia:4.2e7,cutIn:3,cutOut:25,cpPeak:.46,tsrOpt:7.4,width:4.5,drive:.94,gen:.93,maxRpm:12.1,minRpm:6.9,responseTime:24},VAWT:{radius:4.2,area:2*4.2*18,inertia:680,cutIn:2.5,cutOut:25,cpPeak:.31,tsrOpt:2.7,width:2.2,drive:.97,gen:.93,maxRpm:100,minRpm:8,responseTime:14}};
+const MODELS={HAWT:{radius:63,area:Math.PI*63**2,inertia:4.2e7,cutIn:3,cutOut:25,cpPeak:.46,tsrOpt:7.4,width:4.5,drive:.94,gen:.93,maxRpm:12.1,minRpm:6.9,responseTime:24,spinUpRpmPerSecond:.42},BIO_HAWT:{radius:63,area:Math.PI*63**2,inertia:4.2e7,cutIn:3,cutOut:25,cpPeak:.46,tsrOpt:7.4,width:4.5,drive:.94,gen:.93,maxRpm:12.1,minRpm:6.9,responseTime:24},VAWT:{radius:4.2,area:2*4.2*18,inertia:680,cutIn:2.5,cutOut:25,cpPeak:.31,tsrOpt:2.7,width:2.2,drive:.97,gen:.93,maxRpm:100,minRpm:8,responseTime:14,spinUpRpmPerSecond:3.2}};
 export const modelParameters=t=>MODELS[t]||MODELS.HAWT;
 const cpAt=(tsr,t)=>{const m=modelParameters(t);return clamp(m.cpPeak*Math.exp(-Math.pow((tsr-m.tsrOpt)/m.width,2))*(1-Math.exp(-Math.max(0,tsr)/1.15)),0,t!=='VAWT'?.593:.45);};
 const directionFactor=d=>clamp(.86+.11*Math.cos(2*rad(d-18))+.03*Math.cos(4*rad(d)),.68,1);
@@ -51,10 +51,11 @@ export function stepRotor(type,p,previous,dt,time=0){
   const targetOmega=m.tsrOpt*v/m.radius;
   const targetRpm=clamp(targetOmega*60/TWO_PI,m.minRpm,m.maxRpm);
   const target=targetRpm*TWO_PI/60;
-  // Exact first-order response: no minimum per-frame jump, so rotor RPM
-  // builds smoothly over the configured response time.
-  const response=1-Math.exp(-h/m.responseTime);
-  omega+=(target-omega)*response;
+  // Rate-limited spin-up: the rotor must accelerate from its current speed.
+  // This prevents the minimum operating RPM or target RPM from appearing instantly.
+  const targetDelta=target-omega;
+  const maxStep=(m.spinUpRpmPerSecond||.4)*TWO_PI/60*h;
+  omega+=clamp(targetDelta,-maxStep,maxStep);
   omega=clamp(omega,0,m.maxRpm*TWO_PI/60*1.03);
  }
  return{omega};
