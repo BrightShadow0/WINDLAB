@@ -53,7 +53,7 @@ function DirectionDial({value,onChange}){
  <circle cx="60" cy="60" r="48" className="compass-ring"/><circle cx="60" cy="60" r="39" className="compass-inner"/>
  {Array.from({length:36},(_,i)=>{const t=i*Math.PI/18,x1=60+Math.sin(t)*(i%3===0?44:46),y1=60-Math.cos(t)*(i%3===0?44:46),x2=60+Math.sin(t)*48,y2=60-Math.cos(t)*48;return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} className={i%3===0?'compass-major':'compass-tick'}/>;})}
  <text x="60" y="16" textAnchor="middle" className="compass-cardinal">N</text><text x="104" y="63" textAnchor="middle" className="compass-cardinal">E</text><text x="60" y="111" textAnchor="middle" className="compass-cardinal">S</text><text x="16" y="63" textAnchor="middle" className="compass-cardinal">W</text>
- <line x1="60" y1="60" x2={ex} y2={ey} className="compass-needle"/><circle cx="60" cy="60" r="5" className="compass-hub"/>
+ <line x1="60" y1="60" x2={ex} y2={ey} className="compass-needle"/><path d="M60 20 L55 32 L65 32 Z" transform={"rotate("+value+" 60 60)"} className="compass-arrow"/><circle cx="60" cy="60" r="5" className="compass-hub"/>
  </svg><div className="compass-hint">DRAG TO SET HEADING</div></div><div className="direction-meta"><span>0° NORTH</span><span>360° / 0°</span></div></div>;
 }
 function Metric({label,value,unit='',sub=''}){return <div className="metric"><small>{label}</small><strong>{value}<i>{unit}</i></strong>{sub&&<em>{sub}</em>}</div>}
