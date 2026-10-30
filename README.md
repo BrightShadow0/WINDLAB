@@ -17,6 +17,7 @@ npm run preview
 ## Features
 - Interactive conventional three-blade HAWT, whale-tubercle-inspired three-blade HAWT, and two opposing twisted VAWT panels with orbit, zoom and camera views.
 - Wind speed (0–25 m/s), direction, turbulence intensity, air density and generator-load controls.
+- Selectable simulation time scale (1×, 2×, 5× or 10×) accelerates rotor dynamics, simulation time, energy integration and live graph sampling together.
 - Both HAWT variants support automatic yaw alignment and fixed-heading modes.
 - Rotor angular dynamics driven by aerodynamic torque, generator-load torque and mechanical losses.
 - Tip-speed-ratio-dependent Cp, cut-in/cut-out protection and HAWT yaw-misalignment penalty.
