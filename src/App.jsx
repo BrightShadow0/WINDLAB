@@ -5,7 +5,7 @@ import {DEFAULTS,evaluate,stepRotor,buildSweep} from './engine.js';
 
 function Scene({type,rpm,wind,direction,playing,view,yawMode,turbulence}){
  const host=useRef(null),cam=useRef(null),live=useRef({rpm,wind,direction,playing,turbulence:0});
- useEffect(()=>{live.current={rpm,wind,direction,playing,yawMode,turbulence};},[rpm,wind,direction,playing,yawMode]);
+ useEffect(()=>{live.current={rpm,wind,direction,playing,yawMode,turbulence};},[rpm,wind,direction,playing,yawMode,turbulence]);
  useEffect(()=>{
   const el=host.current,scene=new THREE.Scene();scene.background=new THREE.Color('#07111d');scene.fog=new THREE.Fog('#07111d',28,90);
   const camera=new THREE.PerspectiveCamera(38,el.clientWidth/el.clientHeight,.1,200);camera.position.set(17,13,23);cam.current=camera;
