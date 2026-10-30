@@ -1,7 +1,7 @@
 # WINDLAB
 ### Interactive 3D Wind-Turbine Simulation and Comparative Analysis
 
-WINDLAB is an educational simulator comparing a conventional three-bladed horizontal-axis wind turbine (HAWT) with a custom two-panel twisted vertical-axis wind turbine (VAWT). It combines an interactive Three.js scene, adjustable wind conditions, reduced-order rotor dynamics and dynamically generated performance plots.
+WINDLAB is an educational simulator comparing a conventional three-bladed horizontal-axis wind turbine (HAWT), a whale-tubercle-inspired three-bladed HAWT, and a custom two-panel twisted vertical-axis wind turbine (VAWT). It combines an interactive Three.js scene, adjustable wind conditions, reduced-order rotor dynamics and dynamically generated performance plots.
 
 ## Run locally
 ```bash
@@ -15,9 +15,9 @@ npm run preview
 ```
 
 ## Features
-- Interactive HAWT and two opposing twisted VAWT panels with orbit, zoom and camera views.
+- Interactive conventional three-blade HAWT, whale-tubercle-inspired three-blade HAWT, and two opposing twisted VAWT panels with orbit, zoom and camera views.
 - Wind speed (0–25 m/s), direction, turbulence intensity, air density and generator-load controls.
-- HAWT automatic yaw alignment and fixed-heading modes.
+- Both HAWT variants support automatic yaw alignment and fixed-heading modes.
 - Rotor angular dynamics driven by aerodynamic torque, generator-load torque and mechanical losses.
 - Tip-speed-ratio-dependent Cp, cut-in/cut-out protection and HAWT yaw-misalignment penalty.
 - Live RPM, available wind power, aerodynamic power, electrical output, Cp, estimated noise and accumulated energy.
@@ -49,11 +49,12 @@ Turbulence is a deterministic multi-frequency gust approximation scaled by the s
 - **Noise:** Illustrative logarithmic combination of an assumed rotor-related source and ambient background. Not a certified acoustic prediction.
 
 ## Geometry and assumptions
-The HAWT visual/reference dimensions are inspired by the 126 m rotor NREL 5-MW reference turbine. The VAWT uses an assumed 4.2 m radius and 18 m height for its projected two-panel swept area. VAWT dimensions and Cp are not measured.
+Both HAWT visual/reference dimensions use the 126 m rotor NREL 5-MW reference turbine scale. The whale-inspired HAWT adds illustrative leading-edge tubercles inspired by humpback whale flippers; this is a visual biomimetic concept, not a validated performance improvement. The VAWT uses an assumed 4.2 m radius and 18 m height for its projected two-panel swept area. VAWT dimensions and Cp are not measured.
 
 ## Scientific limitations
 This is an educational reduced-order model, not validated CFD, a certified digital twin or an engineering design tool.
 - The custom VAWT has no validated measured Cp curve. Its Cp and direction-response functions are assumptions.
+- The whale-inspired HAWT uses the same reduced-order performance assumptions as the conventional HAWT. Its tubercle geometry is illustrative; no aerodynamic benefit is assumed or proven by this simulator.
 - The HAWT is not a reproduction of the full NREL aero-servo-elastic model or its certified power curve.
 - Detailed blade-element aerodynamics, dynamic stall, drivetrain compliance, structural loads and turbine controller dynamics are not modelled.
 - Turbulence is a deterministic gust approximation, not a full atmospheric-boundary-layer model.
